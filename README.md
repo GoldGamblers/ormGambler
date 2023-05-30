@@ -1,4 +1,22 @@
 # 对象关系映射 ORM
+
+- [对象关系映射 ORM](#对象关系映射-orm)
+  - [一、实现日志分级功能：](#一实现日志分级功能)
+  - [二、实现 Session 用于实现和数据库的交互功能](#二实现-session-用于实现和数据库的交互功能)
+    - [1、Session封装了三个原生的数据库操作方法：](#1session封装了三个原生的数据库操作方法)
+    - [2、实现对对不同数据库的sql语句的支持 (Dialect)](#2实现对对不同数据库的sql语句的支持-dialect)
+    - [3、实现对象和表的转换 (schema)](#3实现对象和表的转换-schema)
+    - [4、实现新增和查询](#4实现新增和查询)
+    - [5、实现修改和删除以及统计功能](#5实现修改和删除以及统计功能)
+    - [6、实现钩子功能](#6实现钩子功能)
+    - [7、实现事务功能](#7实现事务功能)
+  - [三、实现 Engine 用于 Session 交互前的准备工作](#三实现-engine-用于-session-交互前的准备工作)
+    - [1、创建 Engine 用于准备工作或者全局的一些工作，包括连接数据库等](#1创建-engine-用于准备工作或者全局的一些工作包括连接数据库等)
+    - [2、Engine 提供用于创建对应的 Session 的方法](#2engine-提供用于创建对应的-session-的方法)
+    - [3、Engine 提供对封装的事务方法的调用，为用户提供一键式使用的接口](#3engine-提供对封装的事务方法的调用为用户提供一键式使用的接口)
+    - [4、Engine 提供对数据库迁移的调用，使用了之前的事务](#4engine-提供对数据库迁移的调用使用了之前的事务)
+
+
 目的：通过使用描述对象和数据库之间映射的元数据，将面向对象语言程序中的对象自动持久化到关系数据库中。
 
 ORM 框架相当于对象和数据库中间的一个桥梁，借助 ORM 可以避免写繁琐的 SQL 语言，仅仅通过操作具体的对象，就能够完成对关系型数据库的操作。
@@ -268,25 +286,25 @@ type Engine struct {
     dialect dialect.Dialect // 添加 dialect 实现对不同数据库的支持
 }
 ```
-### 创建 Engine 用于准备工作或者全局的一些工作，包括连接数据库等
+### 1、创建 Engine 用于准备工作或者全局的一些工作，包括连接数据库等
 
 ```go
 func NewEngine(driver, source string) (e *Engine, err error) 
 ```
 
-### Engine 提供用于创建对应的 Session 的方法
+### 2、Engine 提供用于创建对应的 Session 的方法
 
 ```go
 func (engine *Engine) NewSession() *session.Session
 ```
 
-### Engine 提供对封装的事务方法的调用，为用户提供一键式使用的接口
+### 3、Engine 提供对封装的事务方法的调用，为用户提供一键式使用的接口
 
 ```go
 func (engine *Engine) Transaction(f TxFunc) (result interface{}, err error)
 ```
 
-### Engine 提供对数据库迁移的调用，使用了之前的事务
+### 4、Engine 提供对数据库迁移的调用，使用了之前的事务
 
 ```go
 func (engine *Engine) Migrate(value interface{}) error
